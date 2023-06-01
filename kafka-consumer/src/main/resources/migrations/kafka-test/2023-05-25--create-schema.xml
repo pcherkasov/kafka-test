@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet logicalFilePath="/kafka-test/2023-05-25--create-schema.xml"
+               author="pavelc"
+               id="2023-05-25--01-create-client-table">
+        <createTable tableName="client">
+            <column name="client_id" type="bigserial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="email" type="varchar(50)"/>
+            <column name="is_fake" type="boolean" defaultValueBoolean="false"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet logicalFilePath="/kafka-test/2023-05-25--create-schema.xml"
+               author="pavelc"
+               id="2023-05-25--02-create-transaction-table">
+        <createTable tableName="transaction">
+            <column name="id" type="bigserial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="bank" type="varchar(100)"/>
+            <column name="client_id" type="bigserial">
+                <constraints nullable="false"/>
+            </column>
+            <column name="order_type" type="varchar(50)"/>
+            <column name="quantity" type="integer"/>
+            <column name="price" type="decimal(21,2)"/>
+            <column name="total_cost" type="decimal(21,2)"/>
+            <column name="created_at" type="datetime" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet logicalFilePath="/kafka-test/2023-05-25--create-schema.xml"
+               id="2023-05-25--03-transaction_client--add-foreign-key"
+               author="pavelc">
+        <addForeignKeyConstraint baseTableName="transaction"
+                                 baseColumnNames="client_id"
+                                 constraintName="fk_transaction_client"
+                                 referencedTableName="client"
+                                 referencedColumnNames="client_id"/>
+    </changeSet>
+
+</databaseChangeLog>
