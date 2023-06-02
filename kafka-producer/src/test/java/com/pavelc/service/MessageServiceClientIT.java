@@ -32,8 +32,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @DirtiesContext
-@SpringBootTest
-@EmbeddedKafka(bootstrapServersProperty = "localhost:9055")
+@SpringBootTest(properties = "spring.kafka.bootstrap-servers=${spring.embedded.kafka.brokers}")
+@EmbeddedKafka()
 public class MessageServiceClientIT {
 
   private static final String CLIENT_TOPIC = "test-topic";
@@ -42,17 +42,14 @@ public class MessageServiceClientIT {
   @Autowired
   private MessageService service;
 
+  @Autowired
+  private EmbeddedKafkaBroker kafkaBroker;
+
   private KafkaMessageListenerContainer<Long, Client> container;
   private BlockingQueue<ConsumerRecord<Long, Client>> records;
 
-  @ClassRule
-  public static EmbeddedKafkaRule embeddedKafkaRule = new EmbeddedKafkaRule(1, true, 5, CLIENT_TOPIC);
-
   @Before
   public void setUp() {
-
-    EmbeddedKafkaBroker kafka = embeddedKafkaRule.getEmbeddedKafka();
-    kafka.kafkaPorts(9055);
 
     DefaultJackson2JavaTypeMapper typeMapper = new DefaultJackson2JavaTypeMapper();
     typeMapper.addTrustedPackages("com.pavelc.model");
@@ -64,7 +61,7 @@ public class MessageServiceClientIT {
     ContainerProperties props = new ContainerProperties(CLIENT_TOPIC);
     DefaultKafkaConsumerFactory<Long, Client> consumer =
         new DefaultKafkaConsumerFactory<>(
-            KafkaTestUtils.consumerProps(CLIENTS_GROUP_ID, "false", kafka),
+            KafkaTestUtils.consumerProps(CLIENTS_GROUP_ID, "false", kafkaBroker),
             new LongDeserializer(),
             valueDeserializer
         );
@@ -72,7 +69,7 @@ public class MessageServiceClientIT {
     container.setupMessageListener((MessageListener<Long, Client>) record -> records.add(record));
     container.start();
 
-    ContainerTestUtils.waitForAssignment(container, kafka.getPartitionsPerTopic());
+    ContainerTestUtils.waitForAssignment(container, kafkaBroker.getPartitionsPerTopic());
   }
 
   @Test
