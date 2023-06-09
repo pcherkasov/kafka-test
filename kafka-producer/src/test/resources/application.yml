@@ -1,6 +1,6 @@
 spring:
   kafka:
-    bootstrap-servers: localhost:9094
+    bootstrap-servers: ${spring.embedded.kafka.brokers}
     topic.name:
       client: test-topic
       transaction: test-topic
