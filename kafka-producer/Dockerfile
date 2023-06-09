@@ -1,13 +1,13 @@
-FROM openjdk:17-alpine
-LABEL authors="pavelc"
-
+FROM maven:3.8.4-openjdk-17 AS build
+WORKDIR /app
+COPY pom.xml ./
 COPY .mvn .mvn
-COPY pom.xml \
-     mvnw \
-     ./
-COPY . ./
-RUN chmod +x mvnw
-RUN ./mvnw -DskipTests=true package
-EXPOSE 8080
+COPY mvnw ./
+COPY src ./src
+RUN mvn -DskipTests=true package
 
-ENTRYPOINT ["java", "-jar", "target/kafka-producer-1-exec.jar"]
+FROM openjdk:17
+WORKDIR /app
+COPY --from=build /app/target/kafka-producer-1-exec.jar ./app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
