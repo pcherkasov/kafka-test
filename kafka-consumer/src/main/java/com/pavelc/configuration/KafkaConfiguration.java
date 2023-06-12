@@ -45,11 +45,12 @@ public class KafkaConfiguration {
   @Bean
   public ConsumerFactory<Long, Object> consumerFactory() {
 
-    return new DefaultKafkaConsumerFactory<>(Map.of(
-        BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress,
-        KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class,
-        VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class
-    ));
+    return new DefaultKafkaConsumerFactory<>(
+        Map.of(
+            BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress,
+            KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class,
+            VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class
+        ));
   }
 
   @Bean

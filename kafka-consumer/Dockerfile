@@ -4,7 +4,7 @@ COPY pom.xml ./
 COPY .mvn .mvn
 COPY mvnw ./
 COPY src ./src
-RUN mvn -DskipTests=true package
+RUN mvn package
 
 FROM openjdk:17
 WORKDIR /app
