@@ -20,16 +20,9 @@ Following ports should be free to use:
 ```Shell
 docker-compose up -d
 ```
+5. This command will up all services and run load test.
 
-### Started and what?
-#### Loadtest
-1. Download [JMeter](https://jmeter.apache.org/download_jmeter.cgi)
-2. In project folder `kafka-env` you will find file `Local Kafka Test.jmx`. It is template for __JMeter__
-    - run __JMeter__
-    - click `Open`
-    - Choose `Local Kafka Test.jmx`
-    - Press `Start`
-
+### What next?
 #### Check database
 1. Connect to database:
     - Host: `localhost`

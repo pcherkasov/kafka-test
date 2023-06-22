@@ -36,6 +36,12 @@ services:
       POSTGRES_PASSWORD: root
 
   producer:
+    container_name: producer
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     depends_on:
       kafka:
         condition: service_started
@@ -56,3 +62,15 @@ services:
       context: ../kafka-consumer
     ports:
       - ":8088"
+
+  jmeter:
+    depends_on:
+      producer:
+        condition: service_healthy
+      consumer:
+        condition: service_started
+    image: justb4/jmeter
+    volumes:
+      - ./local-kafka-test.jmx:/jmeter/local-kafka-test.jmx
+    command: -n -t /jmeter/local-kafka-test.jmx -l /jmeter/test-results.jtl
+
