@@ -6,7 +6,7 @@
 Preinstalled:  
 `Docker`,  
 `Docker-Compose`;  
-_For __Windows__ users: install `Docker Decktop`_  
+_For __Windows__ users: install `Docker Decktop`_
 
 Following ports should be free to use:  
 `8087`  
@@ -25,9 +25,9 @@ docker-compose up -d
 ### What next?
 #### Check database
 1. Connect to database:
-    - Host: `localhost`
-    - Port: `5432`
-    - User: `liquibase_user`
-    - Password: `liquibase_password`
-    - Database: `bank_db`
+   - Host: `localhost`
+   - Port: `5432`
+   - User: `liquibase_user`
+   - Password: `liquibase_password`
+   - Database: `bank_db`
 2. Check tables: `client`, `transaction`.
