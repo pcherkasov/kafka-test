@@ -75,6 +75,7 @@ services:
     command: -n -t /jmeter/local-kafka-test.jmx -l /jmeter/test-results.jtl
 
   kafka-connector:
+    container_name: kafka-connect
     depends_on:
       postgres:
         condition: service_started
@@ -84,8 +85,11 @@ services:
     ports:
       - "8083:8083"
     environment:
-      CONNECT_BOOTSTRAP_SERVERS: kafka_container:9092
+      CONNECT_BOOTSTRAP_SERVERS: kafka_container:29092
       CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connect
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "1"
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "1"
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
       CONNECT_REST_PORT: 8083
       CONNECT_GROUP_ID: kafka-connect-group
       CONNECT_CONFIG_STORAGE_TOPIC: connect-configs

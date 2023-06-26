@@ -9,7 +9,7 @@
     "database.dbname": "bank_db",
     "database.server.name": "postgres",
     "table.whitelist": "client, transaction",
-    "database.history.kafka.bootstrap.servers": "kafka:9092",
+    "database.history.kafka.bootstrap.servers": "kafka_container:29092",
     "database.history.kafka.topic": "db-history"
   }
 }
