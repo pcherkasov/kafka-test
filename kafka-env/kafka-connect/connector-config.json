@@ -1,0 +1,15 @@
+{
+  "name": "postgres-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "database.hostname": "postgres",
+    "database.port": "5432",
+    "database.user": "liquibase_user",
+    "database.password": "liquibase_password",
+    "database.dbname": "bank_db",
+    "database.server.name": "postgres",
+    "table.whitelist": "client, transaction",
+    "database.history.kafka.bootstrap.servers": "kafka:9092",
+    "database.history.kafka.topic": "db-history"
+  }
+}
