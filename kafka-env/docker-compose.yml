@@ -22,7 +22,7 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
 
   postgres:
     restart: on-failure
@@ -67,8 +67,8 @@ services:
     depends_on:
       producer:
         condition: service_healthy
-      kafka-connector:
-        condition: service_healthy
+      curl-image:
+        condition: service_completed_successfully
     image: justb4/jmeter
     volumes:
       - ./local-kafka-test.jmx:/jmeter/local-kafka-test.jmx
@@ -106,8 +106,8 @@ services:
     depends_on:
       kafka-connector:
         condition: service_healthy
-    image: curlimages/curl:latest
+    image: curlimages/curl:7.77.0
     volumes:
       - ./kafka-connect/connector-config.json:/connector-config.json
-    command: >
-      sh -c 'curl -X POST --location "http://kafka-connect:8083/connectors" -H "Content-Type: application/json" -H "Accept: application/json" -d @connector-config.json'
+      - ./kafka-connect/entrypoint.sh:/entrypoint.sh
+    command: sh -c /entrypoint.sh

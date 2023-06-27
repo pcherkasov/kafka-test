@@ -8,7 +8,6 @@
     "database.password": "liquibase_password",
     "database.dbname": "bank_db",
     "database.server.name": "postgres",
-    "auto.create.topics.enable": true,
     "table.blacklist": "public.databasechangelog, public.databasechangeloglock",
     "database.history.kafka.topic": "db-history",
     "topic.prefix": "postgres"
