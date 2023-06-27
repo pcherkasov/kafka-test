@@ -67,8 +67,8 @@ services:
     depends_on:
       producer:
         condition: service_healthy
-      consumer:
-        condition: service_started
+      kafka-connector:
+        condition: service_healthy
     image: justb4/jmeter
     volumes:
       - ./local-kafka-test.jmx:/jmeter/local-kafka-test.jmx
@@ -101,3 +101,13 @@ services:
       CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_LOG4J_ROOT_LOGLEVEL: "INFO"
       CONNECT_PLUGIN_PATH: /usr/share/java,/usr/share/confluent-hub-components
+
+  curl-image:
+    depends_on:
+      kafka-connector:
+        condition: service_healthy
+    image: curlimages/curl:latest
+    volumes:
+      - ./kafka-connect/connector-config.json:/connector-config.json
+    command: >
+      sh -c 'curl -X POST --location "http://kafka-connect:8083/connectors" -H "Content-Type: application/json" -H "Accept: application/json" -d @connector-config.json'

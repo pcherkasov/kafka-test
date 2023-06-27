@@ -1,3 +1,3 @@
-FROM postgres:13.0-alpine
+FROM debezium/postgres:13
 
 COPY *.sql /docker-entrypoint-initdb.d/
