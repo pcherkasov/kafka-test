@@ -40,11 +40,11 @@
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="HTTPSampler.domain">producer</stringProp>
-          <stringProp name="HTTPSampler.port">8080</stringProp>
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">8087</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">http://producer:8080/api/clients</stringProp>
+          <stringProp name="HTTPSampler.path">http://localhost:8087/api/clients</stringProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -74,22 +74,22 @@
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
                 <stringProp name="Argument.value">{&#xd;
     &quot;bank&quot;: &quot;test bank&quot;,&#xd;
-    &quot;clientId&quot;: ${generatedId},&#xd;
-    &quot;orderType&quot;: &quot;INCOME&quot;,&#xd;
-    &quot;quantity&quot;: 234,&#xd;
-    &quot;price&quot;: 534.54,&#xd;
+    &quot;clientId&quot;: ${__Random(1, 100)},&#xd;
+    &quot;orderType&quot;: &quot;${random_order_type}&quot;,&#xd;
+    &quot;quantity&quot;: ${__Random(1, 400)},&#xd;
+    &quot;price&quot;: ${__javaScript(parseFloat(${__Random(10, 600)}).toFixed(2))},&#xd;
     &quot;email&quot;: &quot;test@test.tst&quot;,&#xd;
-    &quot;createdAt&quot;: &quot;2023-05-14T09:57:01.3023419&quot;&#xd;
+    &quot;createdAt&quot;: &quot;${random_created_at}&quot;&#xd;
 }</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="HTTPSampler.domain">producer</stringProp>
-          <stringProp name="HTTPSampler.port">8080</stringProp>
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">8087</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">http://producer:8080/api/transactions</stringProp>
+          <stringProp name="HTTPSampler.path">http://localhost:8087/api/transactions</stringProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -110,6 +110,33 @@
             </collectionProp>
           </HeaderManager>
           <hashTree/>
+          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="Random Date" enabled="true">
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="script">import java.time.format.DateTimeFormatter
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.Instant
+import java.util.concurrent.ThreadLocalRandom
+
+LocalDateTime startDate = LocalDateTime.parse(&quot;2023-06-01T00:00:00&quot;, DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd&apos;T&apos;HH:mm:ss&quot;))
+LocalDateTime endDate = LocalDateTime.parse(&quot;2023-07-01T00:00:00&quot;, DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd&apos;T&apos;HH:mm:ss&quot;))
+
+long startSecond = startDate.atZone(ZoneId.systemDefault()).toEpochSecond()
+long endSecond = endDate.atZone(ZoneId.systemDefault()).toEpochSecond()
+long randomSecond = ThreadLocalRandom.current().nextLong(startSecond, endSecond)
+LocalDateTime randomDate = LocalDateTime.ofInstant(Instant.ofEpochSecond(randomSecond), ZoneId.systemDefault())
+
+vars.put(&quot;random_created_at&quot;, randomDate.format(DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd&apos;T&apos;HH:mm:ss&quot;)))
+
+List&lt;String&gt; orderTypes = [&quot;INCOME&quot;, &quot;OUTCOME&quot;]
+String randomOrderType = orderTypes[new Random().nextInt(orderTypes.size())]
+
+vars.put(&quot;random_order_type&quot;, randomOrderType)</stringProp>
+            <stringProp name="scriptLanguage">groovy</stringProp>
+          </JSR223PreProcessor>
+          <hashTree/>
         </hashTree>
         <SyncTimer guiclass="TestBeanGUI" testclass="SyncTimer" testname="2 threads" enabled="true">
           <intProp name="groupSize">2</intProp>
@@ -117,7 +144,7 @@
         </SyncTimer>
         <hashTree/>
       </hashTree>
-      <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Counter" enabled="true">
+      <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="ClientId" enabled="true">
         <stringProp name="CounterConfig.start">1</stringProp>
         <stringProp name="CounterConfig.end">100</stringProp>
         <stringProp name="CounterConfig.incr">1</stringProp>
