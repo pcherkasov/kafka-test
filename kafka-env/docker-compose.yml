@@ -76,7 +76,6 @@ services:
       postgres:
         condition: service_started
     build:
-      dockerfile: ./Dockerfile
       context: ./kafka-connect
     ports:
       - "8083:8083"
