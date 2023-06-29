@@ -3,7 +3,7 @@ services:
   zookeeper:
     image: confluentinc/cp-zookeeper
     ports:
-      - ":2181"
+      - "2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -15,7 +15,7 @@ services:
     image: confluentinc/cp-kafka
     container_name: kafka_container
     ports:
-      - "9092:9092"
+      - "9092"
     environment:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_BROKER_ID: 1
@@ -25,11 +25,11 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
 
   postgres:
+    image: debezium/postgres:13
     restart: on-failure
     container_name: postgres
-    build:
-      dockerfile: ./Dockerfile
-      context: ./postgres
+    volumes:
+      - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
     ports:
       - '5432:5432'
     environment:
@@ -46,7 +46,6 @@ services:
       kafka:
         condition: service_started
     build:
-      dockerfile: ./Dockerfile
       context: ../kafka-producer
     ports:
       - "8087:8080"
@@ -58,10 +57,7 @@ services:
       kafka:
         condition: service_started
     build:
-      dockerfile: ./Dockerfile
       context: ../kafka-consumer
-    ports:
-      - ":8088"
 
   jmeter:
     depends_on:
