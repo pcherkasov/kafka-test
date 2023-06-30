@@ -1,0 +1,6 @@
+spring:
+  kafka:
+    bootstrap-servers: kafka_container:29092
+    topic.name:
+      client: client
+      transaction: transaction

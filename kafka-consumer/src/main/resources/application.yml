@@ -1,0 +1,21 @@
+server:
+  port: 8088
+spring:
+  kafka:
+    bootstrap-servers: kafka_container:29092
+    topic.name:
+      client: client
+      transaction: transaction
+  jpa:
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    username: liquibase_user
+    password: liquibase_password
+    jdbc-url: jdbc:postgresql://postgres:5432/bank_db
+  liquibase:
+    change-log: classpath:migrations/kafka-test-master.xml

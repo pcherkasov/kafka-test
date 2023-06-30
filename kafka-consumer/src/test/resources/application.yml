@@ -1,0 +1,19 @@
+spring:
+  kafka:
+    bootstrap-servers: ${spring.embedded.kafka.brokers}
+    topic.name:
+      client: client
+      transaction: transaction
+  jpa:
+    database: h2
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: none
+  datasource:
+    driver-class-name: org.h2.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    username: sa
+    password: sa
+    jdbc-url: jdbc:h2:mem:db;
+  liquibase:
+    change-log: classpath:migrations/kafka-test-master.xml
