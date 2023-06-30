@@ -22,7 +22,7 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
 
   postgres:
     image: debezium/postgres:13
@@ -63,10 +63,46 @@ services:
     depends_on:
       producer:
         condition: service_healthy
-      consumer:
-        condition: service_started
+      curl-image:
+        condition: service_completed_successfully
     image: justb4/jmeter
     volumes:
       - ./local-kafka-test.jmx:/jmeter/local-kafka-test.jmx
     command: -n -t /jmeter/local-kafka-test.jmx -l /jmeter/test-results.jtl
 
+  kafka-connector:
+    container_name: kafka-connect
+    depends_on:
+      postgres:
+        condition: service_started
+    build:
+      context: ./kafka-connect
+    ports:
+      - "8083:8083"
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: kafka_container:29092
+      CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connect
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "1"
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "1"
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
+      CONNECT_REST_PORT: 8083
+      CONNECT_GROUP_ID: kafka-connect-group
+      CONNECT_CONFIG_STORAGE_TOPIC: connect-configs
+      CONNECT_OFFSET_STORAGE_TOPIC: connect-offsets
+      CONNECT_STATUS_STORAGE_TOPIC: connect-status
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_LOG4J_ROOT_LOGLEVEL: "INFO"
+      CONNECT_PLUGIN_PATH: /usr/share/java,/usr/share/confluent-hub-components
+
+  curl-image:
+    depends_on:
+      kafka-connector:
+        condition: service_healthy
+    image: curlimages/curl:7.77.0
+    volumes:
+      - ./kafka-connect/connector-config.json:/connector-config.json
+      - ./kafka-connect/entrypoint.sh:/entrypoint.sh
+    command: sh -c /entrypoint.sh
